@@ -132,22 +132,19 @@ class SelectUserRoleScreen extends StatelessWidget {
   }
 
   Widget buildUserTypeButton(String role, BuildContext context) {
-    switch (role) {
-      case UserRole.student:
-        PreferenceManager.saveUserRole(UserRole.student);
-        break;
-      case UserRole.broker:
-        PreferenceManager.saveUserRole(UserRole.broker);
-        break;
-      case UserRole.technical:
-        PreferenceManager.saveUserRole(UserRole.technical);
-        break;
-    }
-
     return ElevatedButton(
       onPressed: () {
-        PreferenceManager.saveUserRole(UserRole.student);
-
+        switch (role) {
+          case UserRole.student:
+            PreferenceManager.saveUserRole(UserRole.student);
+            break;
+          case UserRole.broker:
+            PreferenceManager.saveUserRole(UserRole.broker);
+            break;
+          case UserRole.technical:
+            PreferenceManager.saveUserRole(UserRole.technical);
+            break;
+        }
         Navigator.pushNamed(context, login);
       },
       style: ElevatedButton.styleFrom(
@@ -155,6 +152,8 @@ class SelectUserRoleScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
+
+          
         ),
       ),
       child: Text(

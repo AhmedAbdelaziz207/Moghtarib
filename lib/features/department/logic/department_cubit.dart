@@ -6,14 +6,15 @@ import 'package:mo3tarib/core/network/services/webservice.dart';
 import 'package:mo3tarib/features/department/logic/department_state.dart';
 
 import '../../../core/network/model/department.dart';
+import '../../../core/utils/di.dart';
 
 class DepartmentCubit extends Cubit<DepartmentState> {
   DepartmentCubit() : super(DepartmentInitial());
 
-  getDepartments() async {
+ void getDepartments() async {
     emit(DepartmentLoading());
     try {
-      Response response = await Webservice().getDepartments();
+      Response response = await getIt<Webservice>().getDepartments();
 
       // Assuming response.data is a List<dynamic> containing department objects
       List<dynamic> responseData = response.data;
@@ -22,9 +23,6 @@ class DepartmentCubit extends Cubit<DepartmentState> {
       List<Department> departments = responseData
           .map((departmentJson) => Department.fromJson(departmentJson))
           .toList();
-
-
-      log("Department name: ${departments[0].name}");
 
       // Emit the loaded state with the list of departments
       emit(DepartmentLoaded(departments: departments));

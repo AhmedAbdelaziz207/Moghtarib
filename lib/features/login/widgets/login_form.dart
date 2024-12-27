@@ -7,7 +7,9 @@ import 'package:mo3tarib/features/login/logic/login_cubit.dart';
 
 import '../../../core/routing/routes.dart';
 import '../../../core/theme/colors.dart';
+import '../../../core/theme/colors.dart';
 import '../../../core/widgets/custom_text_field.dart';
+import '../logic/login_state.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -57,60 +59,79 @@ class LoginForm extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.h),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: secondaryColor,
-              minimumSize: Size(double.infinity, 50.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-            ),
-            child: Text(
-              'تسجيل الدخول',
-              style: TextStyle(
-                fontSize: 18.sp,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(height: 15.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'ليس لديك حساب؟',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextButton(
-                onPressed: () {
+          BlocConsumer<LoginCubit, LoginState>(
+            listener: handleLoginState,
+            builder: (context,state) {
+              return ElevatedButton(
+                onPressed: state is LoginLoading ? (){} : () {
                   if (formKey.currentState!.validate()) {
                     context.read<LoginCubit>().login();
                   }
-
-                  Navigator.pushNamed(context, register);
                 },
-                child: Text(
-                  'إنشاء حساب',
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: secondaryColor,
+                  minimumSize: Size(double.infinity, 50.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+                child: state is LoginLoading ? CircularProgressIndicator(color: secondaryColor,) : Text(
+                  'تسجيل الدخول',
                   style: TextStyle(
-                    fontSize: 14.sp,
-                    color: primaryColor,
-                    decoration: TextDecoration.underline,
-                    decorationColor: primaryColor,
+                    fontSize: 18.sp,
+                    color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-            ],
+              );
+            }
+          ),
+          SizedBox(height: 15.h),
+
+               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'ليس لديك حساب؟',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+
+
+                      Navigator.pushNamed(context, register);
+                    },
+                    child: Text(
+                      'إنشاء حساب',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: primaryColor,
+                        decoration: TextDecoration.underline,
+                        decorationColor: primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+
           ),
         ],
       ),
     );
+  }
+
+  handleLoginState(BuildContext context, LoginState state) {
+    if (state is LoginError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(state.message ?? 'Unknown error occurred'),
+        ),
+      );
+    }
   }
 }

@@ -20,6 +20,9 @@ class Webservice {
     return _dio.post(registerEndpoint, data: data);
   }
 
+  Future<Response> login(Map<String, dynamic> data){
+    return _dio.post(loginEndpoint, data: data);
+  }
 
   Future<Response> getDepartments(){
     return _dio.get(departmentEndpoint);

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mo3tarib/features/department/logic/department_cubit.dart';
 import 'package:mo3tarib/features/register/widgets/register_form.dart';
+import 'package:mo3tarib/features/register/widgets/register_image.dart';
 import '../../core/theme/colors.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -20,11 +21,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
+          backgroundColor: Colors.white,
           leading: const SizedBox(),
           actions: [
             IconButton(
@@ -39,10 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              Image(
-                image: const AssetImage("assets/images/app_logo.png"),
-                height: 80.h,
-              ),
+              const RegisterImage(),
               SizedBox(
                 height: 12.h,
               ),
@@ -57,6 +56,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(
                 height: 12.h,
               ),
+              Image(
+                image: const AssetImage("assets/images/app_logo.png"),
+                height: 40.h,
+              ),
+              SizedBox(
+                height: 12.h,
+              )
             ],
           ),
         ));
