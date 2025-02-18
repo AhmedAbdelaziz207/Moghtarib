@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mo3tarib/core/constants/assets.dart';
 import 'package:mo3tarib/features/login/widgets/login_form.dart';
 
 import '../../core/theme/colors.dart';
@@ -19,7 +20,7 @@ class LoginScreen extends StatelessWidget {
             children: [
               SizedBox(height: 80.h),
               Image.asset(
-                'assets/images/app_logo.png', // Replace with your logo path
+                Assets.appLogo, // Replace with your logo path
                 height: 80.h,
               ),
               SizedBox(height: 10.h),

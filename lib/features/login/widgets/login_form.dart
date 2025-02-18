@@ -132,6 +132,11 @@ class LoginForm extends StatelessWidget {
           content: Text(state.message ?? 'Unknown error occurred'),
         ),
       );
+
     }
+    if(state is LoginSuccess){
+      Navigator.pushNamedAndRemoveUntil(context, home, (route) => false);
+    }
+
   }
 }

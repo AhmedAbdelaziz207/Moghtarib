@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mo3tarib/core/network/model/user_role.dart';
+import 'package:mo3tarib/core/constants/user_role.dart';
 import 'package:mo3tarib/core/utils/preference_manager.dart';
 import 'package:mo3tarib/core/widgets/custom_button.dart';
 import '../../core/routing/routes.dart';

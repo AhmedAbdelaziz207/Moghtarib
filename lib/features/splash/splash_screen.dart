@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mo3tarib/core/routing/routes.dart';
+import 'package:mo3tarib/core/utils/preference_manager.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,6 +14,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Future.delayed(const Duration(seconds: 3), () {
+      if(PreferenceManager.getToken()!= null){
+        Navigator.pushNamed(context, home);
+      }
+
+
       if(context.mounted){
       Navigator.pushNamed(context, onboarding);
       }

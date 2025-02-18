@@ -14,4 +14,12 @@ class PreferenceManager {
   static void removeUserRole() {
     box.remove('role');
   }
+
+  static saveToken(token) => box.write('token', token);
+
+  static saveUsername(username) => box.write('username', username);
+
+  static getUsername(username) => box.read('username');
+
+  static getToken() => box.read('token');
 }
