@@ -1,13 +1,12 @@
-import 'dart:developer';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mo3tarib/core/network/model/UserModel.dart';
+import 'package:mo3tarib/core/constants/user_role.dart';
+import 'package:mo3tarib/core/di/di.dart';
+import 'package:mo3tarib/core/network/api_service.dart';
 import 'package:mo3tarib/core/utils/preference_manager.dart';
-import '../../../core/helpers/api_error_handler.dart';
-import '../../../core/network/model/user_role.dart';
-import '../../../core/network/services/webservice.dart';
-import '../../../core/utils/di.dart';
+import 'package:mo3tarib/features/register/model/UserModel.dart';
+import 'package:mo3tarib/features/register/model/register_repsonse.dart';
+import '../../../core/network/api_error_handler.dart';
 import 'register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
@@ -29,31 +28,28 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(RegisterLoading());
 
     try {
-      await getIt<Webservice>().createAccount(
+      final RegisterResponse response = await getIt<ApiService>().register(
         UserModel(
-          userName: userNameController.text,
           firstName: firstNameController.text,
           lastName: lastNameController.text,
+          userName: userNameController.text,
           email: emailController.text,
-          password: passwordController.text,
-          phoneNumber: phoneNumberController.text,
           nationalId: nationalIdController.text,
-          websiteURL: websiteController.text,
+          phoneNumber: phoneNumberController.text,
           whatsappNumber: whatsappController.text,
-          role: PreferenceManager.getUserRole() ?? UserRole.student,
+          password: passwordController.text,
+          websiteURL: websiteController.text,
+          role: UserRole.translate(PreferenceManager.getUserRole()),
+          departmentId: selectedDepartmentId,
         ).toJson(),
       );
 
-      emit(RegisterSuccess());
+      emit(RegisterSuccess(response: response));
     } catch (e) {
-      // Check if the exception is a DioException and get the error message from it
-
-      if (e is DioException) {
-        emit(RegisterError(message: getErrorMessage(e)));
-      } else {
-        emit(RegisterError(message: e.toString()));
-      }
-      log("Register error: $e");
+      final errorMessage = ApiErrorHandler.handle(e).getErrorsMessage();
+      emit(RegisterError(
+        message: errorMessage,
+      ));
     }
   }
 
@@ -68,7 +64,6 @@ class RegisterCubit extends Cubit<RegisterState> {
     nationalIdController.dispose();
     emailController.dispose();
     passwordController.dispose();
-
     return super.close();
   }
 }

@@ -1,4 +1,4 @@
-import '../../../core/network/model/department.dart';
+import '../model/department.dart';
 
 sealed class DepartmentState {}
 

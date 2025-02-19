@@ -1,0 +1,1 @@
+enum EditOrAddApartmentDestination { edit, add }

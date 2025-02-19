@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mo3tarib/core/utils/preference_manager.dart';
 import 'package:mo3tarib/features/register/logic/register_cubit.dart';
 import 'package:mo3tarib/features/register/widgets/professionDropDown.dart';
-import '../../../core/network/model/user_role.dart';
+import '../../../core/constants/user_role.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/widgets/custom_text_field.dart';
 import '../logic/register_state.dart';
@@ -39,6 +39,12 @@ class RegisterForm extends StatelessWidget {
             hintText: 'اسم المستخدم',
             prefixIcon: Icons.person,
             controller: context.read<RegisterCubit>().userNameController,
+          ),
+          SizedBox(height: 15.h),
+          CustomTextFormField(
+            hintText: 'الايميل',
+            prefixIcon: Icons.email,
+            controller: context.read<RegisterCubit>().emailController,
           ),
           SizedBox(height: 15.h),
           CustomTextFormField(
@@ -80,11 +86,13 @@ class RegisterForm extends StatelessWidget {
           BlocConsumer<RegisterCubit, RegisterState>(
             listener: (context, state) => handleRegisterState(context, state),
             builder: (context, state) => ElevatedButton(
-              onPressed: state is RegisterLoading ? (){} : () {
-                if (formKey.currentState!.validate()) {
-                  context.read<RegisterCubit>().register();
-                }
-              },
+              onPressed: state is RegisterLoading
+                  ? () {}
+                  : () {
+                      if (formKey.currentState!.validate()) {
+                        context.read<RegisterCubit>().register();
+                      }
+                    },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: secondaryColor,
@@ -93,14 +101,18 @@ class RegisterForm extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
               ),
-              child: state is RegisterLoading ? const CircularProgressIndicator(color: Colors.black,) : Text(
-                'انشاء حساب',
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: state is RegisterLoading
+                  ? const CircularProgressIndicator(
+                      color: Colors.black,
+                    )
+                  : Text(
+                      'انشاء حساب',
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ),
           ),
         ],
@@ -113,6 +125,13 @@ class RegisterForm extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(state.message ?? 'Unknown error occurred'),
+        ),
+      );
+    }
+    if (state is RegisterSuccess) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("تم التسجيل بنجاح"),
         ),
       );
     }

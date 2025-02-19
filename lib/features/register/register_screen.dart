@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mo3tarib/core/constants/assets.dart';
 import 'package:mo3tarib/features/department/logic/department_cubit.dart';
 import 'package:mo3tarib/features/register/widgets/register_form.dart';
-import 'package:mo3tarib/features/register/widgets/register_image.dart';
 import '../../core/theme/colors.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -41,7 +41,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const RegisterImage(),
+              SizedBox(
+                height: 12.h,
+              ),
+              Image(
+                image: const AssetImage(Assets.appLogo),
+                height: 80.h,
+              ),
               SizedBox(
                 height: 12.h,
               ),
@@ -53,13 +59,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 child: const RegisterForm(),
               ),
-              SizedBox(
-                height: 12.h,
-              ),
-              Image(
-                image: const AssetImage("assets/images/app_logo.png"),
-                height: 40.h,
-              ),
+
               SizedBox(
                 height: 12.h,
               )
