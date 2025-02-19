@@ -4,7 +4,6 @@ import 'package:mo3tarib/core/widgets/custom_dialog.dart';
 import 'package:mo3tarib/features/add_edit_apartment/model/apartment_model.dart';
 import 'package:mo3tarib/features/add_edit_apartment/model/apartment_params.dart';
 import 'package:mo3tarib/features/add_edit_apartment/model/edit_or_add_apartment_destination.dart';
-
 import '../../../core/routing/routes.dart';
 
 class ApartmentCard extends StatelessWidget {
@@ -45,6 +44,8 @@ class ApartmentCard extends StatelessWidget {
                 // Title
                 Text(
                   "${apartment?.city}, ${apartment?.village}",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style:
                       TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
                 ),

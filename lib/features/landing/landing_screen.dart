@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mo3tarib/features/chat/ui/all_chats_screen.dart';
 import 'package:mo3tarib/features/home/ui/broker_home_body.dart';
+import 'package:mo3tarib/features/home/ui/student_home_screen.dart';
 import '../../core/constants/assets.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -13,8 +15,8 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> {
   int _currentIndex = 0;
   final List<Widget> brokerScreens = [
-    const BrokerHomeBody(),
-    const Center(child: Text("Chats")),
+    const StudentHomeBody(),
+    const AllChatsScreen(),
     const Center(child: Text("Notification")),
     const Center(child: Text("Profile")),
   ];
