@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mo3tarib/core/routing/routes.dart';
 import 'package:mo3tarib/features/add_edit_apartment/add_edit_apartment_screen.dart';
 import 'package:mo3tarib/features/add_edit_apartment/model/apartment_params.dart';
+import 'package:mo3tarib/features/apartment_details/apartment_details_screen.dart';
+import 'package:mo3tarib/features/chat/ui/message_screen.dart';
 import 'package:mo3tarib/features/department/logic/department_cubit.dart';
 import 'package:mo3tarib/features/forgot_password/views/forgot_password_screen.dart';
 import 'package:mo3tarib/features/forgot_password/views/reset_password_screen.dart';
@@ -13,8 +15,10 @@ import 'package:mo3tarib/features/onborading/onboarding_screen.dart';
 import 'package:mo3tarib/features/register/logic/register_cubit.dart';
 import 'package:mo3tarib/features/register/register_screen.dart';
 import 'package:mo3tarib/features/select_role/select_role.dart';
+import 'package:mo3tarib/features/technicians/logic/technicians_cubit.dart';
 import '../../features/access_apartmen_location/access_location_screen.dart';
 import '../../features/access_apartmen_location/logic/access_location_cubit.dart';
+import '../../features/add_edit_apartment/model/apartment_model.dart';
 import '../../features/login/logic/login_cubit.dart';
 import '../../features/splash/splash_screen.dart';
 
@@ -50,11 +54,16 @@ Route<dynamic>? onGenerateRoute(RouteSettings settings) {
       );
     case home:
       return MaterialPageRoute(
-        builder: (_) => const StudentHomeBody(),
+        builder: (_) => const StudentHome(),
       );
     case landing:
       return MaterialPageRoute(
-        builder: (_) => const LandingScreen(),
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) =>  TechniciansCubit(),),
+          ],
+          child: const LandingScreen(),
+        ),
       );
     case addOrEditApartment:
       final params = settings.arguments as ApartmentDetailsParams;
@@ -70,6 +79,20 @@ Route<dynamic>? onGenerateRoute(RouteSettings settings) {
           create: (context) => AccessLocationCubit(),
           child: const AccessLocationScreen(),
         ),
+      );
+    case apartmentDetails:
+      final apartment = settings.arguments as ApartmentModel;
+      return MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (context) => AccessLocationCubit(),
+          child: ApartmentDetailsScreen(apartment: apartment),
+        ),
+      );
+    case messageScreen:
+      return MaterialPageRoute(
+        builder: (_) => BlocProvider(
+            create: (context) => AccessLocationCubit(),
+            child: const MessageScreen()),
       );
 
     default:

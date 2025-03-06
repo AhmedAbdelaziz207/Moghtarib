@@ -45,6 +45,8 @@ class RegisterCubit extends Cubit<RegisterState> {
       );
 
       emit(RegisterSuccess(response: response));
+
+      saveCredentials(response);
     } catch (e) {
       final errorMessage = ApiErrorHandler.handle(e).getErrorsMessage();
       emit(RegisterError(
@@ -65,5 +67,10 @@ class RegisterCubit extends Cubit<RegisterState> {
     emailController.dispose();
     passwordController.dispose();
     return super.close();
+  }
+
+  void saveCredentials(RegisterResponse response) {
+    PreferenceManager.saveToken(response.token);
+    PreferenceManager.saveUsername(firstNameController.text);
   }
 }

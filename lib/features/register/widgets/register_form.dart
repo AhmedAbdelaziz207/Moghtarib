@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mo3tarib/core/routing/routes.dart';
 import 'package:mo3tarib/core/utils/preference_manager.dart';
 import 'package:mo3tarib/features/register/logic/register_cubit.dart';
 import 'package:mo3tarib/features/register/widgets/professionDropDown.dart';
@@ -78,9 +79,9 @@ class RegisterForm extends StatelessWidget {
               hintText: 'لينك موقعك الإلكتروني',
               controller: context.read<RegisterCubit>().websiteController,
             ),
-          if (PreferenceManager.getUserRole() != UserRole.student)
+          if (PreferenceManager.getUserRole() != UserRole.translate(UserRole.student))
             SizedBox(height: 20.h),
-          if (PreferenceManager.getUserRole() == UserRole.technical)
+          if (PreferenceManager.getUserRole() == UserRole.translate(UserRole.technical))
             const ProfessionDropdown(),
           SizedBox(height: 20.h),
           BlocConsumer<RegisterCubit, RegisterState>(
@@ -124,15 +125,20 @@ class RegisterForm extends StatelessWidget {
     if (state is RegisterError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          backgroundColor: Colors.red,
           content: Text(state.message ?? 'Unknown error occurred'),
         ),
       );
     }
     if (state is RegisterSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("تم التسجيل بنجاح"),
-        ),
+        const SnackBar(content: Text("تم التسجيل بنجاح")),
+      );
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        landing,
+        (route) => false,
       );
     }
   }

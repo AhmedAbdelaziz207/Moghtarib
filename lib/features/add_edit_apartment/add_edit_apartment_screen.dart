@@ -22,7 +22,7 @@ class _AddEditApartmentScreenState extends State<AddEditApartmentScreen> {
   late TextEditingController locationController;
 
   String? selectedPropertyType;
-  String? selectedAvailability;
+  String? selectedAvailability ;
 
   @override
   void initState() {
@@ -83,6 +83,7 @@ class _AddEditApartmentScreenState extends State<AddEditApartmentScreen> {
                   ],
                 ),
                 SizedBox(height: 21.h),
+
                 Row(
                   children: [
                     Expanded(
@@ -103,6 +104,19 @@ class _AddEditApartmentScreenState extends State<AddEditApartmentScreen> {
                   ],
                 ),
                 SizedBox(height: 21.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextFormField(
+                        controller: cityController,
+                        hintText: "المساحة",
+                        fillColor: Colors.blueGrey.withOpacity(.2),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 21.h),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

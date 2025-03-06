@@ -32,8 +32,7 @@ class LoginCubit extends Cubit<LoginState> {
           email: emailController.text,
           password: passwordController.text,
         ).toJson(),
-      )) ;
-
+      ));
 
       log("response: ${response.toJson()}");
 
@@ -48,8 +47,8 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   void saveCredentials(LoginResponse response) {
-     PreferenceManager.saveToken(response.token);
-     PreferenceManager.saveUsername(response.userName);
-     PreferenceManager.saveUserRole(response.role!);
+    PreferenceManager.saveToken(response.token);
+    PreferenceManager.saveUsername(response.userName);
+    PreferenceManager.saveUserRole(response.role!);
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mo3tarib/core/routing/routes.dart';
@@ -14,13 +16,21 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Future.delayed(const Duration(seconds: 3), () {
-      if(PreferenceManager.getToken()!= null){
-        Navigator.pushNamed(context, home);
-      }
+      final token = PreferenceManager.getToken();
+      final role = PreferenceManager.getUserRole();
+      log("token: $token");
+      log("role: $role");
 
-
-      if(context.mounted){
-      Navigator.pushNamed(context, onboarding);
+      if (token != null) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          landing,
+          (route) => false,
+        );
+      } else if (role != null) {
+        Navigator.pushNamed(context, login);
+      } else {
+        Navigator.pushNamed(context, onboarding);
       }
     });
     super.initState();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mo3tarib/core/constants/assets.dart';
+import 'package:mo3tarib/core/routing/routes.dart';
 
 class ChatsListItem extends StatelessWidget {
   const ChatsListItem({super.key});
@@ -8,22 +9,30 @@ class ChatsListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.pushNamed(context, messageScreen);
+      },
       child: ListTile(
           leading: CircleAvatar(
             radius: 20.r,
-            backgroundColor: Colors.white,
-            child: Image.asset(Assets.iconsPin, width: 30,),
+            backgroundColor: Colors.orange,
+            child: Text(
+              "O",
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           title: Text(
-            "Ahmed Ali",
+            "Omar",
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 14.sp,
                 ),
           ),
           subtitle: Text(
-            "ازيك يامستر",
+            "اي الاخبار؟",
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.black54,

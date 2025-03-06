@@ -3,11 +3,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theme/colors.dart';
 
 class CustomElevatedButton extends StatelessWidget {
-  const CustomElevatedButton(
-      {super.key, this.backgroundColor, required this.child, this.onPressed});
+  const CustomElevatedButton({
+    super.key,
+    this.backgroundColor,
+    required this.child,
+    this.onPressed,
+    this.minimumSize,
+  });
 
   final Color? backgroundColor;
   final Widget child;
+  final Size? minimumSize;
   final Function()? onPressed;
 
   @override
@@ -16,7 +22,7 @@ class CustomElevatedButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor ?? primaryColor,
-        minimumSize: Size(double.infinity, 45.h),
+        minimumSize: minimumSize ?? Size(double.infinity, 45.h),
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),

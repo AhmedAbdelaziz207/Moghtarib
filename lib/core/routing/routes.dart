@@ -9,4 +9,6 @@ const profile = '/profile';
 const forgotPassword = '/forgot-password';
 const resetPassword = '/reset-password';
 const addOrEditApartment = '/add-or-edit-apartment';
+const apartmentDetails = '/apartment-details';
 const accessLocation = '/access-location';
+const messageScreen = '/message-screen';

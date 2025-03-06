@@ -52,6 +52,8 @@ dependencies:
   custom_info_window: ^1.0.1
   geolocator: ^13.0.2
   google_maps_flutter: ^2.10.0
+  chat_bubbles: ^1.6.0
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:

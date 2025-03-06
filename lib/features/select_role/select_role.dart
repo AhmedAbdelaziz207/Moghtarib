@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mo3tarib/core/constants/constants.dart';
 import 'package:mo3tarib/core/constants/user_role.dart';
 import 'package:mo3tarib/core/utils/preference_manager.dart';
 import 'package:mo3tarib/core/widgets/custom_button.dart';
@@ -136,13 +137,13 @@ class SelectUserRoleScreen extends StatelessWidget {
       onPressed: () {
         switch (role) {
           case UserRole.student:
-            PreferenceManager.saveUserRole(UserRole.student);
+            PreferenceManager.saveUserRole(UserRole.translate(UserRole.student));
             break;
           case UserRole.broker:
-            PreferenceManager.saveUserRole(UserRole.broker);
+            PreferenceManager.saveUserRole(UserRole.translate(UserRole.broker));
             break;
           case UserRole.technical:
-            PreferenceManager.saveUserRole(UserRole.technical);
+            PreferenceManager.saveUserRole(UserRole.translate(UserRole.technical));
             break;
         }
         Navigator.pushNamed(context, login);

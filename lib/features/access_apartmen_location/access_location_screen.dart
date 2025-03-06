@@ -16,22 +16,21 @@ class _AccessLocationScreenState extends State<AccessLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: BlocBuilder<AccessLocationCubit, AccessLocationState>(
         builder: (context, state) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: SizedBox(
+          return SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 450.h,
                   child: AccessLocationMap(
                     onLocationPicked: () {},
                   ),
                 ),
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
+                Container(
+                  width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16.r),
@@ -77,9 +76,9 @@ class _AccessLocationScreenState extends State<AccessLocationScreen> {
                       ],
                     ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           );
         },
       ),

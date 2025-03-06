@@ -29,10 +29,11 @@ class AllChatsScreen extends StatelessWidget {
             ),
             Expanded(
               child: ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return const ChatsListItem();
-                  }),
+                itemCount: 6,
+                itemBuilder: (context, index) {
+                  return const ChatsListItem();
+                },
+              ),
             ),
           ],
         ),

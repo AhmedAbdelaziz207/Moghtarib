@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mo3tarib/core/routing/routes.dart';
-import 'package:mo3tarib/core/utils/dummy.dart';
-import 'package:mo3tarib/features/add_edit_apartment/model/apartment_params.dart';
-import 'package:mo3tarib/features/home/widget/apartment_card.dart';
-import '../../add_edit_apartment/model/edit_or_add_apartment_destination.dart';
 
-class BrokerHomeBody extends StatelessWidget {
-  const BrokerHomeBody({super.key});
+import '../../core/routing/routes.dart';
+import '../../core/utils/dummy.dart';
+import '../add_edit_apartment/model/apartment_params.dart';
+import '../add_edit_apartment/model/edit_or_add_apartment_destination.dart';
+import '../home/widget/apartment_card.dart';
+
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
 
   @override
   Widget build(BuildContext context) {

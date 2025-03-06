@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mo3tarib/core/constants/assets.dart';
+import 'package:mo3tarib/core/routing/routes.dart';
+import 'package:mo3tarib/features/add_edit_apartment/model/apartment_model.dart';
 import 'package:mo3tarib/features/register/model/UserModel.dart';
 import '../helpers/location_helper.dart';
 import 'custom_info_window.dart';
@@ -17,9 +20,11 @@ class MapScreen extends StatefulWidget {
     this.showInfoWindow,
     this.late,
     this.long,
+    this.displayedApartment,
   });
 
   final List<UserModel>? displayedTechnical;
+  final List<ApartmentModel>? displayedApartment;
   final String? late;
   final String? long;
   final bool? showMyLocation;
@@ -44,32 +49,30 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     getCurrentLocation();
 
-
-
     if (widget.late != null && widget.long != null) {
       technicalCameraPosition = CameraPosition(
-          target:
-              LatLng(double.parse(widget.late!), double.parse(widget.long!)),
-          zoom: 10.0,
-          tilt: 0.0,
-          bearing: 0.0);
+        target: LatLng(double.parse(widget.late!), double.parse(widget.long!)),
+        zoom: 4,
+        tilt: 2.0,
+        bearing: 2.0,
+      );
     }
 
     loadMarkerIcon();
   }
+
   getCurrentLocation() async {
     Position position = await LocationHelper.getCurrentLocation();
     setState(() {
       currentPosition = position;
       technicalCameraPosition = CameraPosition(
         target: LatLng(position.latitude, position.longitude),
-        zoom: 14.0,  // Adjust zoom level as needed
+        zoom: 10.0, // Adjust zoom level as needed
         tilt: 0.0,
         bearing: 0.0,
       );
     });
   }
-
 
   static final CameraPosition myLocationCameraPosition = CameraPosition(
     target: LatLng(currentPosition!.latitude, currentPosition!.longitude),
@@ -79,13 +82,11 @@ class _MapScreenState extends State<MapScreen> {
   );
 
   loadMarkerIcon() {
-    BitmapDescriptor.asset(
-            const ImageConfiguration(), 'assets/icons/technical_avatar.png',
+    BitmapDescriptor.asset(const ImageConfiguration(), Assets.iconsHome,
             width: 40.w, height: 50.h)
         .then((value) {
       markerIcon = value;
     });
-
   }
 
   @override
@@ -101,21 +102,27 @@ class _MapScreenState extends State<MapScreen> {
                       technicalCameraPosition ?? myLocationCameraPosition,
                   mapType: MapType.normal,
                   markers: {
-                    if (widget.displayedTechnical != null)
-                      ...?widget.displayedTechnical?.map(
-                        (technical) => Marker(
-                          markerId: MarkerId(technical.userName.toString()),
+                    if (widget.displayedApartment != null)
+                      ...?widget.displayedApartment?.map(
+                        (apartment) => Marker(
+                          markerId: MarkerId(
+                            apartment.id.toString(),
+                          ),
                           icon: markerIcon ?? BitmapDescriptor.defaultMarker,
-                          position: LatLng(double.parse(technical.addressLat!),
-                              double.parse(technical.addressLong!)),
+                          position: LatLng(
+                            double.parse(apartment.addressLat!),
+                            double.parse(apartment.addressLong!),
+                          ),
                           onTap: () {
-                            if (widget.showInfoWindow ?? false) {
-                              _customInfoWindowController.addInfoWindow!(
-                                const MyInfoWindow(),
-                                LatLng(double.parse(technical.addressLat!),
-                                    double.parse(technical.addressLong!)),
-                              );
-                            }
+                            _customInfoWindowController.addInfoWindow!(
+                              MyInfoWindow(
+                                apartment: apartment,
+                              ),
+                              LatLng(
+                                double.parse(apartment.addressLat!),
+                                double.parse(apartment.addressLong!),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -123,8 +130,10 @@ class _MapScreenState extends State<MapScreen> {
                       Marker(
                         markerId: const MarkerId("0"),
                         icon: markerIcon ?? BitmapDescriptor.defaultMarker,
-                        position: LatLng(double.parse(widget.late!),
-                            double.parse(widget.long!)),
+                        position: LatLng(
+                          double.parse(widget.late!),
+                          double.parse(widget.long!),
+                        ),
                       ),
                   },
                   myLocationButtonEnabled: true,
@@ -147,9 +156,11 @@ class _MapScreenState extends State<MapScreen> {
         ),
         CustomInfoWindow(
           controller: _customInfoWindowController,
-          height: MediaQuery.of(context).size.height * 0.28,  // 30% of screen height
-          width: MediaQuery.of(context).size.width * 0.75,    // 70% of screen width
-          offset: 20,  // or adjust based on screen width if needed
+          height:
+              MediaQuery.of(context).size.height * 0.28, // 30% of screen height
+          width:
+              MediaQuery.of(context).size.width * 0.75, // 70% of screen width
+          offset: 20, // or adjust based on screen width if needed
         ),
       ],
     );
