@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mo3tarib/core/constants/user_role.dart';
+import 'package:mo3tarib/core/utils/preference_manager.dart';
+import 'package:mo3tarib/features/add_edit_apartment/logic/apartment_cubit.dart';
+import 'package:mo3tarib/features/chat/logic/chat_cubit.dart';
 import 'package:mo3tarib/features/chat/ui/all_chats_screen.dart';
 import 'package:mo3tarib/features/home/ui/broker_home_body.dart';
 import 'package:mo3tarib/features/home/ui/student_home_screen.dart';
+import 'package:mo3tarib/features/profile/profile_screen.dart';
 import '../../core/constants/assets.dart';
+import '../favorites/favorites_screen.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -14,11 +21,21 @@ class LandingScreen extends StatefulWidget {
 
 class _LandingScreenState extends State<LandingScreen> {
   int _currentIndex = 0;
+  String? userType = PreferenceManager.getUserRole();
   final List<Widget> brokerScreens = [
-    const StudentHomeBody(),
-    const AllChatsScreen(),
-    const Center(child: Text("Notification")),
-    const Center(child: Text("Profile")),
+    PreferenceManager.getUserRole()?.toLowerCase() ==
+            "Semsar".toLowerCase()
+        ? const BrokerHomeBody()
+        : const StudentHomeBody(),
+    BlocProvider(
+      create: (_) => ChatCubit(),
+      child: const AllChatsScreen(),
+    ),
+    PreferenceManager.getUserRole()?.toLowerCase() ==
+            UserRole.broker.toLowerCase()
+        ? const BrokerHomeBody()
+        : const FavoritesScreen(),
+    const ProfileScreen()
   ];
 
   @override
@@ -29,7 +46,7 @@ class _LandingScreenState extends State<LandingScreen> {
         backgroundColor: Colors.white,
         title: ListTile(
           title: Text(
-            "مرحبا احمد 👋",
+            "مرحبا ${PreferenceManager.getUsername()} 👋",
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
@@ -43,38 +60,67 @@ class _LandingScreenState extends State<LandingScreen> {
         ),
       ),
       body: brokerScreens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.only(top: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xff102E50),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          currentIndex: _currentIndex,
+          onTap: (value) {
+            setState(() {
+              _currentIndex = value;
+            });
+          },
+          selectedItemColor: Colors.orange,
+          unselectedItemColor: Colors.grey,
+          selectedFontSize: 0,
+          unselectedFontSize: 0,
+          iconSize: 26,
+          items: [
+            _buildBarItem("assets/icons/home.png", 0),
+            _buildBarItem("assets/icons/chat.png", 1),
+            if (userType?.toLowerCase() != UserRole.broker.toLowerCase())
+              _buildBarItem("assets/icons/bookmarks.png", 2),
+            _buildBarItem("assets/icons/user.png", 3),
+          ],
+        ),
+      ),
+    );
+  }
 
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconSize: 28.sp,
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        currentIndex: _currentIndex,
-        onTap: (value) {
-          setState(() {
-            _currentIndex = value;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined), label: "Home"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: "Chat",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_outlined),
-            label: "Notifications",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined),
-            label: "Profile",
-          ),
-        ],
+  BottomNavigationBarItem _buildBarItem(String icon, int index) {
+    final bool isActive = _currentIndex == index;
+    return BottomNavigationBarItem(
+      label: '',
+      icon: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color:
+              isActive ? Colors.orange.withOpacity(0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Image.asset(
+          icon,
+          width: 24,
+          color: isActive ? Colors.orange : Colors.white,
+        ),
       ),
     );
   }

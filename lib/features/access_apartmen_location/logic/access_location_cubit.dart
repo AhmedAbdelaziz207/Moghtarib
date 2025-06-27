@@ -7,14 +7,16 @@ class AccessLocationCubit extends Cubit<AccessLocationState> {
   AccessLocationCubit() : super(AccessLocationInitial());
   late Position location;
 
-  Future<void> getUserLocation() async {
+  Future<Position?> getUserLocation() async {
     log("get User Location");
+    emit(AccessLocationLoading());
     try {
+      location = await Geolocator.getCurrentPosition();
       emit(AccessLocationLoaded(location: location));
+      return location;
     } catch (e) {
       emit(AccessLocationError(message: e.toString()));
+      return location;
     }
   }
-
-
 }

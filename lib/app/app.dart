@@ -21,7 +21,7 @@ class App extends StatelessWidget {
           builder: (context, child) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
-              initialRoute: landing,
+              initialRoute: splash,
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
               locale: const Locale("ar"),

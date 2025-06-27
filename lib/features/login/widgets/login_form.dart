@@ -135,7 +135,7 @@ class LoginForm extends StatelessWidget {
 
     }
     if(state is LoginSuccess){
-      Navigator.pushNamedAndRemoveUntil(context, home, (route) => false);
+      Navigator.pushNamedAndRemoveUntil(context, landing, (route) => false);
     }
 
   }

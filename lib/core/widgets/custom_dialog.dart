@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mo3tarib/core/widgets/custom_button.dart';
+import 'package:mo3tarib/features/add_edit_apartment/logic/apartment_cubit.dart';
+import 'package:mo3tarib/features/add_edit_apartment/model/apartment_model.dart';
+import 'package:mo3tarib/features/favorites/logic/favorites_cubit.dart';
 
- showDeletionDialog(context) {
+showDeletionDialog(context, onDelete) {
   return showAdaptiveDialog(
     context: context,
     builder: (context) {
@@ -37,10 +41,13 @@ import 'package:mo3tarib/core/widgets/custom_button.dart';
                             .headlineMedium
                             ?.copyWith(
                               fontSize: 12.sp,
+                              color: Colors.black,
                               fontWeight: FontWeight.w800,
                             ),
                       ),
-                      onPressed: () {Navigator.pop(context); },
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
                   ),
                   Expanded(
@@ -53,10 +60,11 @@ import 'package:mo3tarib/core/widgets/custom_button.dart';
                             .headlineMedium
                             ?.copyWith(
                               fontSize: 12.sp,
-                              color: Colors.red,
+                              color: Colors.white,
                               fontWeight: FontWeight.w800,
                             ),
                       ),
+                      onPressed: onDelete ,
                     ),
                   ),
                 ],

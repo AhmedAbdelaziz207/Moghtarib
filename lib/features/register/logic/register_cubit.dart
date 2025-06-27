@@ -4,7 +4,7 @@ import 'package:mo3tarib/core/constants/user_role.dart';
 import 'package:mo3tarib/core/di/di.dart';
 import 'package:mo3tarib/core/network/api_service.dart';
 import 'package:mo3tarib/core/utils/preference_manager.dart';
-import 'package:mo3tarib/features/register/model/UserModel.dart';
+import 'package:mo3tarib/features/register/model/user_model.dart';
 import 'package:mo3tarib/features/register/model/register_repsonse.dart';
 import '../../../core/network/api_error_handler.dart';
 import 'register_state.dart';

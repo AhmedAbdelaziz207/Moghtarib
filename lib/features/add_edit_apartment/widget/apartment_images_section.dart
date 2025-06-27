@@ -1,16 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mo3tarib/core/constants/assets.dart';
 
-class ApartmentImagesSection extends StatefulWidget {
-  final List<String> initialImageUrls;
+import '../logic/apartment_cubit.dart';
 
-  const ApartmentImagesSection({
-    super.key,
-    required this.initialImageUrls,
-  });
+class ApartmentImagesSection extends StatefulWidget {
+  const ApartmentImagesSection({super.key});
 
   @override
   State<ApartmentImagesSection> createState() => _ApartmentImagesSectionState();
@@ -19,55 +17,24 @@ class ApartmentImagesSection extends StatefulWidget {
 class _ApartmentImagesSectionState extends State<ApartmentImagesSection> {
   final PageController _pageController = PageController();
   int selectedIndex = 0;
-  late List<String> imageUrls;
-  final Map<int, File?> tempFiles = {};
 
-  @override
-  void initState() {
-    super.initState();
-    imageUrls = List.from(widget.initialImageUrls);
-  }
-
-  Future<void> _editImage(int index) async {
+  Future<void> _addImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
-        tempFiles[index] = File(pickedFile.path);
+        context.read<ApartmentCubit>().imageFiles.add(File(pickedFile.path));
+
+        selectedIndex = context.read<ApartmentCubit>().imageFiles.length - 1;
       });
     }
   }
 
   void _deleteImage(int index) {
     setState(() {
-      imageUrls.removeAt(index);
-      tempFiles.remove(index);
-      selectedIndex = (selectedIndex - 1).clamp(0, imageUrls.length - 1);
-    });
-  }
-
-  void _addImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        imageUrls.add(pickedFile.path);
-        tempFiles[imageUrls.length - 1] = File(pickedFile.path);
-        selectedIndex = imageUrls.length - 1;
-      });
-    }
-  }
-
-  void _saveChanges() {
-    setState(() {
-      tempFiles.forEach((index, file) {
-        if (file != null) {
-          imageUrls[index] = file.path;
-        }
-      });
-      tempFiles.clear();
+      context.read<ApartmentCubit>().imageFiles.removeAt(index);
+      selectedIndex = (selectedIndex - 1).clamp(0, context.read<ApartmentCubit>().imageFiles.length - 1);
     });
   }
 
@@ -85,41 +52,31 @@ class _ApartmentImagesSectionState extends State<ApartmentImagesSection> {
               Expanded(
                 child: SizedBox(
                   height: 300,
-                  child: PageView.builder(
+                  child: context.read<ApartmentCubit>().imageFiles.isEmpty
+                      ? const Center(child: Text("لم يتم إضافة صور بعد"))
+                      : PageView.builder(
                     controller: _pageController,
                     onPageChanged: (index) {
-                      setState(() {
-                        selectedIndex = index;
-                      });
+                      setState(() => selectedIndex = index);
                     },
-                    itemCount: imageUrls.length,
+                    itemCount: context.read<ApartmentCubit>().imageFiles.length,
                     itemBuilder: (context, index) {
-                      final tempFile = tempFiles[index];
-                      return InkWell(
-                        onTap: () => _editImage(index),
-                        child: Stack(
-                          children: [
-                            tempFile != null
-                                ? Image.file(tempFile, fit: BoxFit.fitHeight, width: double.infinity)
-                                : Image.network(imageUrls[index], fit: BoxFit.contain, width: double.infinity),
-                            Positioned(
-                              top: 10,
-                              right: 10,
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit, color: Colors.black, size: 30),
-                                    onPressed: () => _editImage(index),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red, size: 30),
-                                    onPressed: () => _deleteImage(index),
-                                  ),
-                                ],
-                              ),
+                      return Stack(
+                        children: [
+                          Image.file(
+                            context.read<ApartmentCubit>().imageFiles[index],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red, size: 30),
+                              onPressed: () => _deleteImage(index),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -128,26 +85,30 @@ class _ApartmentImagesSectionState extends State<ApartmentImagesSection> {
             ],
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            imageUrls.length,
-                (index) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: Container(
-                width: selectedIndex == index ? 16 : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.orange,
+        if (context.read<ApartmentCubit>().imageFiles.isNotEmpty)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              context.read<ApartmentCubit>().imageFiles.length,
+                  (index) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Container(
+                  width: selectedIndex == index ? 16 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.orange,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
         const SizedBox(height: 20),
       ],
     );
   }
+
+  /// Optional: To retrieve selected image files for upload
+  List<File> getSelectedImages() => context.read<ApartmentCubit>().imageFiles;
 }

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'apartment_model.g.dart';
 
 @JsonSerializable()
@@ -7,8 +8,10 @@ class ApartmentModel {
   final String? city;
   final String? village;
   final String? location;
-  final String? addressLat;
-  final String? addressLong;
+  @JsonKey(name: 'address_Lat')
+  final double? addressLat;
+  @JsonKey(name: 'address_Lon')
+  final double? addressLong;
   final int? price;
   final int? numOfRooms;
   final String? baseImageURL;
@@ -48,3 +51,27 @@ class ApartmentModel {
 
   Map<String, dynamic> toJson() => _$ApartmentModelToJson(this);
 }
+/*
+{
+    "id": 0,
+    "city": "string",
+    "village": "string",
+    "location": "string",
+    "address_Lat": 0,
+    "address_Lon": 0,
+    "price": 0,
+    "numOfRooms": 0,
+    "baseImageURL": "string",
+    "type": 1,
+    "distanceByMeters": 0,
+    "isRent": true,
+    "dateOfCreation": "2025-06-08T16:19:55.194Z",
+    "userId": "string",
+    "userName": "string",
+    "userPhone": "string",
+    "userWhatsapp": "string",
+    "imagesURL": [
+      "string"
+    ]
+  }
+ */

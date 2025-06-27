@@ -7,6 +7,10 @@ class PreferenceManager {
     box.write('role', role);
   }
 
+  static String? getUserId() {
+    return box.read('userId');
+  }
+
   static String? getUserRole() {
     return box.read('role');
   }
@@ -14,12 +18,18 @@ class PreferenceManager {
   static void removeUserRole() {
     box.remove('role');
   }
+  static void removeAll() {
+    box.erase();
+  }
+
 
   static saveToken(token) => box.write('token', token);
 
   static saveUsername(username) => box.write('username', username);
 
-  static getUsername(username) => box.read('username');
+  static saveUserid(username) => box.write('userId', username);
+
+  static getUsername() => box.read('username');
 
   static getToken() => box.read('token');
 }

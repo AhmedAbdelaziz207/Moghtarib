@@ -5,21 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mo3tarib/features/register/model/UserModel.dart';
+import 'package:mo3tarib/features/add_edit_apartment/model/apartment_model.dart';
 import '../helpers/location_helper.dart';
 import 'custom_info_window.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({
     super.key,
-    this.displayedTechnical,
-    this.showMyLocation,
-    this.showInfoWindow,
+    this.displayedApartments,
+    this.showMyLocation = true,
+    this.showInfoWindow = true,
     this.late,
     this.long,
   });
 
-  final List<UserModel>? displayedTechnical;
+  final List<ApartmentModel>? displayedApartments;
   final String? late;
   final String? long;
   final bool? showMyLocation;
@@ -37,19 +37,19 @@ class _MapScreenState extends State<MapScreen> {
   Completer<GoogleMapController> mapController =
       Completer<GoogleMapController>();
   BitmapDescriptor? markerIcon;
-  CameraPosition? technicalCameraPosition;
+  CameraPosition? deviceCameraPosition;
 
   @override
   void initState() {
     super.initState();
     getCurrentLocation();
 
-
-
     if (widget.late != null && widget.long != null) {
-      technicalCameraPosition = CameraPosition(
-          target:
-              LatLng(double.parse(widget.late!), double.parse(widget.long!)),
+      deviceCameraPosition = CameraPosition(
+          target: LatLng(
+            double.parse(widget.late!),
+            double.parse(widget.long!),
+          ),
           zoom: 10.0,
           tilt: 0.0,
           bearing: 0.0);
@@ -57,19 +57,20 @@ class _MapScreenState extends State<MapScreen> {
 
     loadMarkerIcon();
   }
+
   getCurrentLocation() async {
     Position position = await LocationHelper.getCurrentLocation();
+    if (!context.mounted) return false;
     setState(() {
       currentPosition = position;
-      technicalCameraPosition = CameraPosition(
+      deviceCameraPosition = CameraPosition(
         target: LatLng(position.latitude, position.longitude),
-        zoom: 14.0,  // Adjust zoom level as needed
+        zoom: 14.0, // Adjust zoom level as needed
         tilt: 0.0,
         bearing: 0.0,
       );
     });
   }
-
 
   static final CameraPosition myLocationCameraPosition = CameraPosition(
     target: LatLng(currentPosition!.latitude, currentPosition!.longitude),
@@ -80,17 +81,18 @@ class _MapScreenState extends State<MapScreen> {
 
   loadMarkerIcon() {
     BitmapDescriptor.asset(
-            const ImageConfiguration(), 'assets/icons/technical_avatar.png',
+            const ImageConfiguration(), 'assets/images/house.png',
             width: 40.w, height: 50.h)
         .then((value) {
       markerIcon = value;
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
     getCurrentLocation();
+    // log("Displayed Apartments: ${widget.displayedApartments?.length}");
+
     return Stack(
       children: [
         SafeArea(
@@ -98,22 +100,25 @@ class _MapScreenState extends State<MapScreen> {
               ? const Center(child: CircularProgressIndicator())
               : GoogleMap(
                   initialCameraPosition:
-                      technicalCameraPosition ?? myLocationCameraPosition,
+                      deviceCameraPosition ?? myLocationCameraPosition,
                   mapType: MapType.normal,
                   markers: {
-                    if (widget.displayedTechnical != null)
-                      ...?widget.displayedTechnical?.map(
-                        (technical) => Marker(
-                          markerId: MarkerId(technical.userName.toString()),
+                    if (widget.displayedApartments != null)
+                      ...?widget.displayedApartments?.map(
+                        (data) => Marker(
+                          markerId: MarkerId(data.userName.toString()),
                           icon: markerIcon ?? BitmapDescriptor.defaultMarker,
-                          position: LatLng(double.parse(technical.addressLat!),
-                              double.parse(technical.addressLong!)),
+                          position: LatLng(
+                              double.parse(data.addressLat.toString()),
+                              double.parse(data.addressLong.toString())),
                           onTap: () {
                             if (widget.showInfoWindow ?? false) {
                               _customInfoWindowController.addInfoWindow!(
-                                const MyInfoWindow(),
-                                LatLng(double.parse(technical.addressLat!),
-                                    double.parse(technical.addressLong!)),
+                                MyInfoWindow(
+                                  apartment: data,
+                                ),
+                                LatLng(double.parse(data.addressLat.toString()),
+                                    double.parse(data.addressLong.toString())),
                               );
                             }
                           },
@@ -147,9 +152,11 @@ class _MapScreenState extends State<MapScreen> {
         ),
         CustomInfoWindow(
           controller: _customInfoWindowController,
-          height: MediaQuery.of(context).size.height * 0.28,  // 30% of screen height
-          width: MediaQuery.of(context).size.width * 0.75,    // 70% of screen width
-          offset: 20,  // or adjust based on screen width if needed
+          height:
+              MediaQuery.of(context).size.height * 0.28, // 30% of screen height
+          width:
+              MediaQuery.of(context).size.width * 0.75, // 70% of screen width
+          offset: 20, // or adjust based on screen width if needed
         ),
       ],
     );

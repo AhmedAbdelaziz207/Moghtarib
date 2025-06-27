@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mo3tarib/core/di/di.dart';
@@ -32,8 +31,7 @@ class LoginCubit extends Cubit<LoginState> {
           email: emailController.text,
           password: passwordController.text,
         ).toJson(),
-      )) ;
-
+      ));
 
       log("response: ${response.toJson()}");
 
@@ -48,8 +46,9 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   void saveCredentials(LoginResponse response) {
-     PreferenceManager.saveToken(response.token);
-     PreferenceManager.saveUsername(response.userName);
-     PreferenceManager.saveUserRole(response.role!);
+    PreferenceManager.saveUserid(response.id!);
+    PreferenceManager.saveToken(response.token);
+    PreferenceManager.saveUsername(response.userName);
+    PreferenceManager.saveUserRole(response.role!.toLowerCase());
   }
 }

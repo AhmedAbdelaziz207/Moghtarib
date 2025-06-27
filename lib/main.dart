@@ -1,3 +1,4 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -10,5 +11,7 @@ Future<void> main() async {
   await GetStorage.init();
   await setupServiceLocator();
 
-  runApp(const App());
+  runApp(
+    const App(),
+  );
 }

@@ -50,6 +50,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         hintStyle: widget.hintStyle,
         filled: true,
         fillColor: widget.fillColor,
+
         contentPadding: widget.contentPadding,
         // Minimize height here
         border: OutlineInputBorder(

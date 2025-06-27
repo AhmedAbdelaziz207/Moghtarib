@@ -38,47 +38,15 @@ class OnboardingScreen extends StatelessWidget {
               const SizedBox(height: 8),
               // Subtitle
               Text(
-                'مقترب يتيح لك البحث عن سكن والوصول الى سمسار ويتيح لك الوصول الى صنايعي',
+                'مغترب يتيح لك البحث عن سكن والوصول الى سمسار ويتيح لك الوصول الى صنايعي',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[700],
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
-              // Page Indicator
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 8,
-                    width: 8,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: const BoxDecoration(
-                      color: Colors.grey,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  Container(
-                    height: 8,
-                    width: 16,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  Container(
-                    height: 8,
-                    width: 8,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: const BoxDecoration(
-                      color: Colors.grey,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ],
-              ),
+
+
               const SizedBox(height: 24),
               // Button
 

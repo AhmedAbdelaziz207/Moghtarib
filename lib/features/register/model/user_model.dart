@@ -1,9 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'UserModel.g.dart';
+part 'user_model.g.dart';
 
 @JsonSerializable()
 class UserModel {
+  final String? id ;
   final String? firstName; // Nullable, maxLength: 20
   final String? lastName; // Nullable, maxLength: 20
   final String? userName; // Required, minLength: 1, maxLength: 60
@@ -17,12 +18,15 @@ class UserModel {
   @JsonKey(name: 'type')
   final String? role; // Required, minLength: 1
   final int? departmentId; // Nullable
+  final String? departmentName ;
   final String? addressLong;
   final String? addressLat;
 
   final double? distance;
 
   UserModel({
+    this.id,
+    this.departmentName,
     this.addressLong,
     this.addressLat,
     this.distance,

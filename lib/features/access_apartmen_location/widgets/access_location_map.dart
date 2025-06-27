@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../logic/access_location_cubit.dart';
+import '../logic/access_location_state.dart';
 
 class AccessLocationMap extends StatefulWidget {
   const AccessLocationMap({
@@ -11,72 +12,74 @@ class AccessLocationMap extends StatefulWidget {
     required this.onLocationPicked,
   });
 
-  final Function() onLocationPicked;
+  final Function(LatLng) onLocationPicked;
 
   @override
   State<AccessLocationMap> createState() => _AccessLocationMapState();
 }
 
 class _AccessLocationMapState extends State<AccessLocationMap> {
-  static Position? currentPosition;
-
   Completer<GoogleMapController> mapController =
       Completer<GoogleMapController>();
 
-  static final CameraPosition myLocationCameraPosition = CameraPosition(
-    target: LatLng(
-      currentPosition?.latitude ?? 0.0,
-      currentPosition?.longitude ?? 0.0,
-    ),
-    bearing: 0.0,
-    tilt: 0.0,
-    zoom: 17.0,
-  );
+  LatLng? selectedPosition;
 
   @override
   void initState() {
     super.initState();
+    context.read<AccessLocationCubit>().getUserLocation();
   }
 
   @override
   Widget build(BuildContext context) {
-    context.read<AccessLocationCubit>().getUserLocation();
-    return SafeArea(
-      child: GoogleMap(
-        initialCameraPosition: myLocationCameraPosition,
-        mapType: MapType.normal,
-        markers: {
-          Marker(
-            markerId: const MarkerId("My Location"),
-            draggable: true,
-            onDragEnd: (value) {
-              currentPosition = Position(
-                latitude: value.latitude,
-                longitude: value.longitude,
-                accuracy: 0.0,
-                altitude: 0.0,
-                heading: 0.0,
-                speed: 0.0,
-                speedAccuracy: 0.0,
-                timestamp: DateTime.now(),
-                altitudeAccuracy: currentPosition?.altitudeAccuracy ?? 0,
-                headingAccuracy: currentPosition?.headingAccuracy ?? 0.0,
-              );
+    return BlocBuilder<AccessLocationCubit, AccessLocationState>(
+      builder: (context, state) {
+        if (state is AccessLocationLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
+        if (state is AccessLocationLoaded) {
+          final position = state.location;
+          selectedPosition ??= LatLng(position.latitude, position.longitude);
+
+          return GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: selectedPosition!,
+              zoom: 17.0,
+            ),
+            onMapCreated: (controller) => mapController.complete(controller),
+            markers: {
+              Marker(
+                markerId: const MarkerId("Selected"),
+                position: selectedPosition!,
+                draggable: true,
+                onDragEnd: (newLatLng) {
+                  setState(() {
+                    selectedPosition = newLatLng;
+                  });
+                },
+              ),
             },
-          )
-        },
-        myLocationButtonEnabled: true,
-        myLocationEnabled: true,
-        buildingsEnabled: true,
-        zoomControlsEnabled: true,
-        zoomGesturesEnabled: true,
-        scrollGesturesEnabled: true,
-        tiltGesturesEnabled: true,
-        onMapCreated: (controller) {
-          mapController.complete(controller);
-        },
-      ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            zoomGesturesEnabled: true,
+            tiltGesturesEnabled: true,
+          );
+        }
+
+        if (state is AccessLocationError) {
+          return Center(child: Text(state.message));
+        }
+
+        return const SizedBox.shrink();
+      },
     );
+  }
+
+  /// Call this from parent when user clicks "Confirm"
+  void confirmLocation() {
+    if (selectedPosition != null) {
+      widget.onLocationPicked(selectedPosition!);
+    }
   }
 }
