@@ -5,6 +5,7 @@ import 'package:mo3tarib/core/constants/assets.dart';
 import 'package:mo3tarib/features/department/logic/department_cubit.dart';
 import 'package:mo3tarib/features/register/widgets/register_form.dart';
 import '../../core/theme/colors.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -54,6 +55,12 @@ class _RegisterScreenState extends State<RegisterScreen>
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: const SizedBox(),
+        title: const Text("انشاء حساب",
+            style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 20)),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () => Navigator.pop(context),

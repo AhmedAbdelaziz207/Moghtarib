@@ -36,9 +36,8 @@ class _EditApartmentScreenState extends State<EditApartmentScreen> {
 
     priceController =
         TextEditingController(text: widget.apartment.price?.toString() ?? '');
-    numOfRoomsController =
-        TextEditingController(
-            text: widget.apartment.numOfRooms?.toString() ?? '');
+    numOfRoomsController = TextEditingController(
+        text: widget.apartment.numOfRooms?.toString() ?? '');
     cityController = TextEditingController(text: widget.apartment.city ?? '');
     locationController =
         TextEditingController(text: widget.apartment.location ?? '');
@@ -129,8 +128,8 @@ class _EditApartmentScreenState extends State<EditApartmentScreen> {
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           value: selectedPropertyType,
-                          decoration: const InputDecoration(
-                              labelText: 'نوع العقار'),
+                          decoration:
+                              const InputDecoration(labelText: 'نوع العقار'),
                           items: const [
                             DropdownMenuItem(
                                 value: 'rent', child: Text('ايجار')),
@@ -148,8 +147,8 @@ class _EditApartmentScreenState extends State<EditApartmentScreen> {
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           value: selectedAvailability,
-                          decoration: const InputDecoration(
-                              labelText: 'مازال متوفر؟'),
+                          decoration:
+                              const InputDecoration(labelText: 'مازال متوفر؟'),
                           items: const [
                             DropdownMenuItem(value: 'yes', child: Text('نعم')),
                             DropdownMenuItem(value: 'no', child: Text('لا')),
@@ -171,18 +170,16 @@ class _EditApartmentScreenState extends State<EditApartmentScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              BlocProvider(
-                                create: (_) => AccessLocationCubit(),
-                                child: AccessLocationScreen(
-                                  onLocationPicked: (loc) {
-                                    if (loc != null) {
-                                      setState(() {
-                                      });
-                                    }
-                                  },
-                                ),
-                              ),
+                          builder: (_) => BlocProvider(
+                            create: (_) => AccessLocationCubit(),
+                            child: AccessLocationScreen(
+                              onLocationPicked: (loc) {
+                                if (loc != null) {
+                                  setState(() {});
+                                }
+                              },
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -214,8 +211,8 @@ class _EditApartmentScreenState extends State<EditApartmentScreen> {
 
                           final updatedApartment = widget.apartment;
 
-                          context.read<ApartmentCubit>().updateApartment(
-                              updatedApartment);
+                          context.read<ApartmentCubit>().editApartment(
+                                apartment: updatedApartment!,);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
@@ -223,12 +220,13 @@ class _EditApartmentScreenState extends State<EditApartmentScreen> {
                               vertical: 14, horizontal: 30),
                         ),
                         child: state is AddApartmentLoading
-                            ? const CircularProgressIndicator(color: Colors
-                            .white)
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
                             : const Text(
-                          'حفظ التعديلات',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
+                                'حفظ التعديلات',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              ),
                       );
                     },
                   ),

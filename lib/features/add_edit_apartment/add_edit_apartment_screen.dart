@@ -11,7 +11,9 @@ import 'package:mo3tarib/features/access_apartmen_location/logic/access_location
 import 'package:mo3tarib/features/add_edit_apartment/logic/apartment_cubit.dart';
 import 'package:mo3tarib/features/add_edit_apartment/model/apartment_model.dart';
 import 'package:mo3tarib/features/add_edit_apartment/model/apartment_params.dart';
+import 'package:mo3tarib/features/add_edit_apartment/model/edit_or_add_apartment_destination.dart';
 import 'package:mo3tarib/features/add_edit_apartment/widget/apartment_images_section.dart';
+import '../../core/routing/routes.dart';
 import '../access_apartmen_location/access_location_screen.dart';
 
 class AddEditApartmentScreen extends StatefulWidget {
@@ -45,8 +47,8 @@ class _AddEditApartmentScreenState extends State<AddEditApartmentScreen> {
         TextEditingController(text: widget.params.apartment?.location ?? '');
 
     selectedPropertyType =
-        widget.params.apartment?.isRent == true ? "rent" : "private";
-    selectedAvailability = widget.params.apartment != null ? "yes" : "no";
+    widget.params.apartment?.isRent == true ? "rent" : "private";
+    selectedAvailability = widget.params.apartment?.type != null ? "yes" : "no";
   }
 
   String? location = "";
@@ -75,7 +77,9 @@ class _AddEditApartmentScreenState extends State<AddEditApartmentScreen> {
               key: formKey,
               child: Column(
                 children: [
-                  const ApartmentImagesSection(),
+                  ApartmentImagesSection(
+                    imageUrls: widget.params.apartment?.imagesURL ?? [],
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -174,70 +178,79 @@ class _AddEditApartmentScreenState extends State<AddEditApartmentScreen> {
                     ],
                   ),
                   SizedBox(height: 21.h),
-                  BlocBuilder<AccessLocationCubit, AccessLocationState>(
-                    builder: (context, state) {
-                      return Align(
-                        alignment: Alignment.centerRight,
-                        child: Row(
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on_outlined,
-                                    color: Colors.blue),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => BlocProvider(
-                                            create: (context) =>
-                                                AccessLocationCubit(),
-                                            child: AccessLocationScreen(
-                                              onLocationPicked: (location) {
-                                                log(" location: ${location?.latitude}, ${location?.longitude}");
-                                              },
-                                            ),
-                                          ),
-                                        )).then(
-                                      (value) async {
-                                        final Position? position = await context
-                                            .read<AccessLocationCubit>()
-                                            .getUserLocation();
+                  if (widget.params.destination ==
+                      EditOrAddApartmentDestination.add)
+                    BlocBuilder<AccessLocationCubit, AccessLocationState>(
+                      builder: (context, state) {
+                        return Align(
+                          alignment: Alignment.centerRight,
+                          child: Row(
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on_outlined,
+                                      color: Colors.blue),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                BlocProvider(
+                                                  create: (context) =>
+                                                      AccessLocationCubit(),
+                                                  child: AccessLocationScreen(
+                                                    onLocationPicked: (
+                                                        location) {
+                                                      log(" location: ${location
+                                                          ?.latitude}, ${location
+                                                          ?.longitude}");
+                                                    },
+                                                  ),
+                                                ),
+                                          )).then(
+                                            (value) async {
+                                          final Position? position =
+                                          await context
+                                              .read<AccessLocationCubit>()
+                                              .getUserLocation();
 
-                                        if (position != null) {
-                                          log(" position: ${position.latitude}, ${position.longitude}");
-                                          setState(() {
-                                            this.position = position;
-                                          });
-                                        } else {
-                                          log(" position: null");
-                                        }
-                                      },
-                                    );
-                                  },
-                                  child: Text(
-                                    "اختر الموقع",
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontSize: 18.sp,
-                                      fontWeight: FontWeight.bold,
+                                          if (position != null) {
+                                            log(" position: ${position
+                                                .latitude}, ${position
+                                                .longitude}");
+                                            setState(() {
+                                              this.position = position;
+                                            });
+                                          } else {
+                                            log(" position: null");
+                                          }
+                                        },
+                                      );
+                                    },
+                                    child: Text(
+                                      "اختر الموقع",
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const Spacer(),
-                            if (state is AccessLocationLoaded)
-                              const Icon(Icons.check_circle,
-                                  color: Colors.green),
-                            SizedBox(
-                              width: 20.w,
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              if (state is AccessLocationLoaded)
+                                const Icon(Icons.check_circle,
+                                    color: Colors.green),
+                              SizedBox(
+                                width: 20.w,
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   SizedBox(height: 30.h),
                   BlocConsumer<ApartmentCubit, ApartmentState>(
                     listener: (context, state) {
@@ -262,41 +275,63 @@ class _AddEditApartmentScreenState extends State<AddEditApartmentScreen> {
                       }
                     },
                     buildWhen: (previous, current) =>
-                        current is AddApartmentSuccess ||
+                    current is AddApartmentSuccess ||
                         current is AddApartmentFailed ||
                         current is AddApartmentLoading,
                     builder: (context, state) {
                       return CustomElevatedButton(
                         child: state is AddApartmentLoading
                             ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
+                          color: Colors.white,
+                        )
                             : Text(
-                                "حفظ",
-                                style: TextStyle(
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                          "حفظ",
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                         onPressed: () {
                           if (!formKey.currentState!.validate()) return;
-                          context.read<ApartmentCubit>().addApartment(
-                                apartment: ApartmentModel(
-                                  city: cityController.text,
-                                  village: locationController.text,
-                                  location: locationController.text,
-                                  price: int.parse(priceController.text),
-                                  // ✅ Convert to int
-                                  numOfRooms:
-                                      int.parse(numOfRoomsController.text),
-                                  // ✅ Convert to int
-                                  type: 1,
-                                  addressLat: position?.latitude ?? 30.0,
-                                  addressLong: position?.longitude ?? 30.0,
-                                  isRent: selectedPropertyType != "rent",
-                                ),
-                              );
+
+                          if (widget.params.destination ==
+                              EditOrAddApartmentDestination.edit) {
+                            context.read<ApartmentCubit>().editApartment(
+                              apartment: ApartmentModel(
+                                id: widget.params.apartment!.id,
+                                city: cityController.text,
+                                village: locationController.text,
+                                location: locationController.text,
+                                price: int.parse(priceController.text),
+                                // ✅ Convert to int
+                                numOfRooms:
+                                int.parse(numOfRoomsController.text),
+                                // ✅ Convert to int
+                                type: 1,
+                                addressLat: position?.latitude ?? 30.0,
+                                addressLong: position?.longitude ?? 30.0,
+                                isRent: selectedPropertyType != "rent",
+                              ),
+                            );
+                          } else {
+                            context.read<ApartmentCubit>().addApartment(
+                              apartment: ApartmentModel(
+                                city: cityController.text,
+                                village: locationController.text,
+                                location: locationController.text,
+                                price: int.parse(priceController.text),
+                                // ✅ Convert to int
+                                numOfRooms:
+                                int.parse(numOfRoomsController.text),
+                                // ✅ Convert to int
+                                type: 1,
+                                addressLat: position?.latitude ?? 30.0,
+                                addressLong: position?.longitude ?? 30.0,
+                                isRent: selectedPropertyType != "rent",
+                              ),
+                            );
+                          }
                         },
                       );
                     },
@@ -314,7 +349,7 @@ class _AddEditApartmentScreenState extends State<AddEditApartmentScreen> {
   Future<void> getAddressFromLatLng(double lat, double lng) async {
     try {
       List<Placemark> placeMarks =
-          await placemarkFromCoordinates(30.5482967, 30.9963733);
+      await placemarkFromCoordinates(30.5482967, 30.9963733);
 
       if (placeMarks.isNotEmpty) {
         final Placemark place = placeMarks[0];

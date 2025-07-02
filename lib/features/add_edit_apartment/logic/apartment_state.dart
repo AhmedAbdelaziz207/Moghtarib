@@ -50,3 +50,8 @@ final class AddApartmentFailed extends ApartmentState {
 
   AddApartmentFailed({required this.message});
 }
+final class GetRatingSuccess extends ApartmentState {
+  final int ratings;
+
+  GetRatingSuccess({required this.ratings});
+}

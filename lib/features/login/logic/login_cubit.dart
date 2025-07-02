@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mo3tarib/core/di/di.dart';
 import 'package:mo3tarib/core/network/api_error_handler.dart';
 import 'package:mo3tarib/core/network/api_service.dart';
+import 'package:mo3tarib/core/network/dio_factory.dart';
 import 'package:mo3tarib/core/utils/preference_manager.dart';
 import 'package:mo3tarib/features/login/logic/login_request_body.dart';
 import 'package:mo3tarib/features/login/logic/login_response.dart';
@@ -35,8 +36,13 @@ class LoginCubit extends Cubit<LoginState> {
 
       log("response: ${response.toJson()}");
 
+      if(response.role?.toLowerCase() == "admin") {
+        emit(LoginError(message: "لا يمكن تسجيل الدخول كمسؤول"));
+        return;
+      }
       saveCredentials(response);
 
+      DioFactory.setTokenIntoHeaderAfterLogin(response.token!);
       emit(LoginSuccess());
     } catch (e) {
       log(" error: $e");

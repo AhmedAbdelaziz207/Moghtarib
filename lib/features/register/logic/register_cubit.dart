@@ -4,9 +4,9 @@ import 'package:mo3tarib/core/constants/user_role.dart';
 import 'package:mo3tarib/core/di/di.dart';
 import 'package:mo3tarib/core/network/api_service.dart';
 import 'package:mo3tarib/core/utils/preference_manager.dart';
-import 'package:mo3tarib/features/register/model/user_model.dart';
 import 'package:mo3tarib/features/register/model/register_repsonse.dart';
 import '../../../core/network/api_error_handler.dart';
+import '../../../core/network/dio_factory.dart';
 import 'register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
@@ -26,24 +26,33 @@ class RegisterCubit extends Cubit<RegisterState> {
 
   Future<void> register() async {
     emit(RegisterLoading());
+    final userType = UserRole.translate(PreferenceManager.getUserRole());
+    String? type;
+    if (userType.toLowerCase() == "broker") {
+      type = "Semsar";
+    } else if (userType.toLowerCase() == "student") {
+      type = "Student";
+    } else {
+
+      type = "Sanaiee";
+    }
 
     try {
-      final RegisterResponse response = await getIt<ApiService>().register(
-        UserModel(
-          firstName: firstNameController.text,
-          lastName: lastNameController.text,
-          userName: userNameController.text,
-          email: emailController.text,
-          nationalId: nationalIdController.text,
-          phoneNumber: phoneNumberController.text,
-          whatsappNumber: whatsappController.text,
-          password: passwordController.text,
-          websiteURL: websiteController.text,
-          role: UserRole.translate(PreferenceManager.getUserRole()),
-          departmentId: selectedDepartmentId,
-        ).toJson(),
-      );
-
+      final RegisterResponse response = await getIt<ApiService>().register({
+        "userName": userNameController.text,
+        "firstName": firstNameController.text,
+        "lastName": lastNameController.text,
+        "email": emailController.text,
+        "password": passwordController.text,
+        "nationalId": nationalIdController.text,
+        "whatsappNumber": whatsappController.text,
+        "websiteURL": websiteController.text.isEmpty? " " : websiteController.text,
+        "type": type,
+        "departmentId": selectedDepartmentId,
+        "phoneNumber": phoneNumberController.text
+      });
+      DioFactory.setTokenIntoHeaderAfterLogin(response.token!);
+      saveCredentials(response);
       emit(RegisterSuccess(response: response));
     } catch (e) {
       final errorMessage = ApiErrorHandler.handle(e).getErrorsMessage();
@@ -51,6 +60,13 @@ class RegisterCubit extends Cubit<RegisterState> {
         message: errorMessage,
       ));
     }
+  }
+
+  void saveCredentials(RegisterResponse response) {
+    PreferenceManager.saveUserid(response.id!);
+    PreferenceManager.saveToken(response.token);
+    PreferenceManager.saveUsername(response.userName);
+    PreferenceManager.saveUserRole(response.role!.toLowerCase());
   }
 
   @override

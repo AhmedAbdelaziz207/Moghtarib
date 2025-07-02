@@ -105,8 +105,11 @@ class ApartmentCard extends StatelessWidget {
                           onPressed: () {
                             Navigator.pushNamed(
                               context,
-                              editApartment,
-                              arguments: apartment,
+                              addOrEditApartment,
+                              arguments: ApartmentDetailsParams(
+                                apartment: apartment,
+                                destination: EditOrAddApartmentDestination.edit,
+                              ),
                             );
                           },
                           style: ElevatedButton.styleFrom(

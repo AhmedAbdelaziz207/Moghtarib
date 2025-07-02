@@ -73,7 +73,7 @@ class _CommentsSectionState extends State<CommentsSection> {
           apiComments = state.comments;
         }
 
-        final allComments = [..._localComments, ...apiComments];
+        final allComments = [...apiComments];
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -97,7 +97,28 @@ class _CommentsSectionState extends State<CommentsSection> {
                       padding: const EdgeInsets.only(bottom: 8),
                       itemBuilder: (context, index) {
                         final comment = allComments[index];
-                        return buildCommentItem(comment, userId);
+                        return InkWell(
+                            onLongPress: () {
+                              if (comment.userId == userId) {
+                                showDeleteDialog(context, () {
+                                  if (_localComments.contains(comment)) {
+                                    _localComments.remove(comment);
+                                    Navigator.pop(context);
+
+                                  } else if (apiComments.contains(comment)) {
+                                    apiComments.remove(comment);
+                                    Navigator.pop(context);
+
+                                  }
+                                  context
+                                      .read<ApartmentCubit>()
+                                      .deleteComment(comment.id!);
+
+                                  setState(() {});
+                                });
+                              }
+                            },
+                            child: buildCommentItem(comment, userId));
                       },
                     ),
             ),
@@ -222,6 +243,67 @@ class _CommentsSectionState extends State<CommentsSection> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void showDeleteDialog(BuildContext context, Function() onDelete) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.delete, color: Colors.red, size: 48),
+              const SizedBox(height: 16),
+              const Text(
+                "حذف التعليق",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                "هل أنت متأكد أنك تريد حذف التعليق؟",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: const Text("لا"),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        onDelete();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: const Text("نعم",
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

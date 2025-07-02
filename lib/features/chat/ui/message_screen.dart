@@ -36,7 +36,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     // 1️⃣ تحميل الرسائل القديمة من Cubit
     context.read<ChatCubit>().getChatContent(widget.receiver.id!);
 
-    signalR.connect(currentUserId!, (senderId, messageId , message) {
+    signalR.connect(currentUserId!, (senderId, messageId, message) {
       log("senderId: $senderId, message: $message, messageId: $messageId");
       final newMsg = ChatMessageModel(
         senderId: senderId,
@@ -78,14 +78,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(widget.receiver.userName ?? "",
-                style:  TextStyle(color: Colors.white, fontSize: 20.sp)),
-             Text(
+                style: TextStyle(color: Colors.white, fontSize: 20.sp)),
+            Text(
               'متصل الآن',
               style: TextStyle(
-                color: Colors.white70,
-                fontSize: 12.sp,
-                fontWeight: FontWeight.bold
-              ),
+                  color: Colors.white70,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -140,8 +139,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
                           color: isMe
-                              ? const Color(0xffE4E6EB)
-                              : const Color(0xff0084FF),
+                              ? const Color(0xff0084FF)
+                              : const Color(0xffE4E6EB),
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
                             topRight: const Radius.circular(16),
@@ -149,12 +148,24 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             bottomRight: Radius.circular(isMe ? 0 : 16),
                           ),
                         ),
-                        child: Text(
-                          msg.message ?? "",
-                          style: TextStyle(
-                            color: isMe ? Colors.black : Colors.white,
-                            fontSize: 16,
-                          ),
+                        child: Column(
+                          children: [
+                            Text(
+                              msg.message ?? "",
+                              style: TextStyle(
+                                color: isMe ? Colors.white : Colors.black,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _formatTime (msg.timestamp)?? "",
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -207,5 +218,21 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ],
       ),
     );
+
   }
+  String _formatTime(String? timestamp) {
+    if (timestamp == null || timestamp.isEmpty) return "";
+
+    try {
+      final dateTime = DateTime.parse(timestamp);
+      final formattedTime = TimeOfDay.fromDateTime(dateTime).format(
+        context,
+      );
+      return formattedTime;
+    } catch (e) {
+      return "";
+    }
+  }
+
+
 }

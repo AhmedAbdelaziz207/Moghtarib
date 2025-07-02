@@ -69,10 +69,16 @@ abstract class ApiService {
   Future<void> addApartmentComments(@Body() body);
 
   @DELETE(ApiEndPoints.addOrDeleteComment)
-  Future<void> deleteApartmentComments(@Query("CommentId") String id);
+  Future<void> deleteApartmentComment(@Query("CommentId") int id);
 
   @POST(ApiEndPoints.sendEmailOTP)
   Future<int> sendEmailOTP(@Query("Email") String email);
+
+  @POST(ApiEndPoints.rate)
+  Future<void> addRate(@Body() Map<String, dynamic> body);
+
+  @GET("${ApiEndPoints.rate}/{apartmentId}")
+  Future<int> getRate(@Path("apartmentId") int id);
 
   @PUT(ApiEndPoints.changePassword)
   Future<String> changePassword(@Body() Map<String, dynamic> body);

@@ -53,6 +53,17 @@ class _AllChatsScreenState extends State<AllChatsScreen> {
                 if (state is GetChatsFailure) {
                   return Center(child: Text(state.message));
                 }
+                if (state is GetChatsSuccess && state.chats.isEmpty) {
+                  return const Center(
+                      child: Text(
+                    "لا يوجد محادثات 🙂",
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ));
+                }
+
                 final List<UserModel> chats =
                     state is GetChatsSuccess ? state.chats : [];
                 return Expanded(

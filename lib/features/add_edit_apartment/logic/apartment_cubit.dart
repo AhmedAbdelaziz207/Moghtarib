@@ -136,6 +136,44 @@ class ApartmentCubit extends Cubit<ApartmentState> {
     }
   }
 
+  Future<void> editApartment({
+    required ApartmentModel apartment,
+  }) async {
+    emit(AddApartmentLoading());
+
+    log("Update Apartment without images");
+    try {
+      final Dio dio = DioFactory.getDio();
+
+      // Extract fields to update
+      final queryParams = {
+        "Id": apartment.id,
+        "City": apartment.city,
+        "Village": apartment.village,
+        "Location": apartment.location,
+        "Price": apartment.price,
+        "NumOfRooms": apartment.numOfRooms,
+        "Type": apartment.type,
+        "address_Lat": apartment.addressLat,
+        "address_Lon": apartment.addressLong,
+        "IsRent": apartment.isRent,
+      };
+
+      // Send PUT request without FormData/images
+      await dio.put(
+        ApiEndPoints.baseUrl + ApiEndPoints.addApartment,
+        queryParameters: queryParams,
+      );
+
+      emit(AddApartmentSuccess());
+      log("Apartment updated successfully (no images).");
+    } catch (e) {
+      log("Error Update apartment: $e");
+      final errorMessage = ApiErrorHandler.handle(e).getErrorsMessage();
+      emit(AddApartmentFailed(message: errorMessage.toString()));
+    }
+  }
+
   deleteApartment(int id) async {
     try {
       await apiService.deleteApartment(id).then(
@@ -154,12 +192,37 @@ class ApartmentCubit extends Cubit<ApartmentState> {
         "apartmentId": id,
         "id": 0,
       });
+      getApartmentComments(id);
     } catch (e) {
       ApiErrorHandler.handle(e).getErrorsMessage();
     }
   }
 
-  void updateApartment(ApartmentModel updatedApartment) {
+  Future<void> deleteComment(int id) async {
+    try {
+      await apiService.deleteApartmentComment(id);
+    } catch (e) {
+      ApiErrorHandler.handle(e).getErrorsMessage();
+    }
+  }
 
+  sendRate(int id, int rate) async {
+    try {
+      await apiService.addRate({
+        "apartmentId": id,
+        "score": rate,
+      });
+    } catch (e) {
+      ApiErrorHandler.handle(e).getErrorsMessage();
+    }
+  }
+
+  getRate(int id) async {
+    try {
+      final response = await apiService.getRate(id);
+      emit(GetRatingSuccess(ratings: response));
+    } catch (e) {
+      ApiErrorHandler.handle(e).getErrorsMessage();
+    }
   }
 }

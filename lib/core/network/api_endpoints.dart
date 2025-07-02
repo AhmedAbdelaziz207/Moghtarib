@@ -12,6 +12,7 @@ class ApiEndPoints {
   static const deleteChat = "api/Chat";
   static const sendMessage = "api/Chat/send";
   static const favorites = "api/Favourite";
+  static const rate = "api/Rating";
 
   static const sendEmailOTP = "api/Account/SendEmail";
 

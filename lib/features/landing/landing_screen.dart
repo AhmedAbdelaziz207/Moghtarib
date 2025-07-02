@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,24 +24,29 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> {
   int _currentIndex = 0;
   String? userType = PreferenceManager.getUserRole();
-  final List<Widget> brokerScreens = [
-    PreferenceManager.getUserRole()?.toLowerCase() ==
-            "Semsar".toLowerCase()
-        ? const BrokerHomeBody()
-        : const StudentHomeBody(),
-    BlocProvider(
-      create: (_) => ChatCubit(),
-      child: const AllChatsScreen(),
-    ),
-    PreferenceManager.getUserRole()?.toLowerCase() ==
-            UserRole.broker.toLowerCase()
-        ? const BrokerHomeBody()
-        : const FavoritesScreen(),
-    const ProfileScreen()
-  ];
+  final isSemsar = PreferenceManager.getUserRole()?.toLowerCase() == "semsar";
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> brokerScreens = [
+      isSemsar ? const BrokerHomeBody() : const StudentHomeBody(),
+
+      BlocProvider(
+        create: (_) => ChatCubit(),
+        child: const AllChatsScreen(),
+      ),
+
+      // Conditionally add Favorite screen (example: use any screen you want)
+      if (!isSemsar) const FavoritesScreen(),
+      // Replace with your actual favorite screen
+
+      const ProfileScreen(),
+      // Profile is always shown
+    ];
+
+    log("userType: $userType");
+
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -95,9 +102,9 @@ class _LandingScreenState extends State<LandingScreen> {
           items: [
             _buildBarItem("assets/icons/home.png", 0),
             _buildBarItem("assets/icons/chat.png", 1),
-            if (userType?.toLowerCase() != UserRole.broker.toLowerCase())
+            if (userType?.toLowerCase() != "semsar".toLowerCase())
               _buildBarItem("assets/icons/bookmarks.png", 2),
-            _buildBarItem("assets/icons/user.png", 3),
+            _buildBarItem("assets/icons/user.png", isSemsar ? 2 : 3),
           ],
         ),
       ),

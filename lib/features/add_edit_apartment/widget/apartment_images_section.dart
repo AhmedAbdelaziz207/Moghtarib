@@ -5,10 +5,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mo3tarib/core/constants/assets.dart';
 
+import '../../../core/network/api_endpoints.dart';
 import '../logic/apartment_cubit.dart';
 
 class ApartmentImagesSection extends StatefulWidget {
-  const ApartmentImagesSection({super.key});
+  const ApartmentImagesSection({
+    super.key,
+    this.imageUrls = const [],
+  });
+
+  final List<String> imageUrls;
 
   @override
   State<ApartmentImagesSection> createState() => _ApartmentImagesSectionState();
@@ -18,28 +24,36 @@ class _ApartmentImagesSectionState extends State<ApartmentImagesSection> {
   final PageController _pageController = PageController();
   int selectedIndex = 0;
 
+  List<File> get imageFiles => context.read<ApartmentCubit>().imageFiles;
+
   Future<void> _addImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
-        context.read<ApartmentCubit>().imageFiles.add(File(pickedFile.path));
-
-        selectedIndex = context.read<ApartmentCubit>().imageFiles.length - 1;
+        imageFiles.add(File(pickedFile.path));
+        selectedIndex = widget.imageUrls.length + imageFiles.length - 1;
       });
     }
   }
 
   void _deleteImage(int index) {
-    setState(() {
-      context.read<ApartmentCubit>().imageFiles.removeAt(index);
-      selectedIndex = (selectedIndex - 1).clamp(0, context.read<ApartmentCubit>().imageFiles.length - 1);
-    });
+    final totalUrls = widget.imageUrls.length;
+
+    if (index >= totalUrls) {
+      final localIndex = index - totalUrls;
+      setState(() {
+        imageFiles.removeAt(localIndex);
+        selectedIndex = (selectedIndex - 1).clamp(0, totalUrls + imageFiles.length - 1);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final totalImages = widget.imageUrls.length + imageFiles.length;
+
     return Column(
       children: [
         InkWell(
@@ -47,35 +61,48 @@ class _ApartmentImagesSectionState extends State<ApartmentImagesSection> {
           child: Row(
             children: [
               SizedBox(width: 8.w),
+              if (widget.imageUrls.isEmpty)
               Image.asset(Assets.iconsAddImage, width: 30, height: 30),
               SizedBox(width: 8.w),
               Expanded(
                 child: SizedBox(
                   height: 300,
-                  child: context.read<ApartmentCubit>().imageFiles.isEmpty
-                      ? const Center(child: Text("لم يتم إضافة صور بعد"))
+                  child: totalImages == 0
+                      ? const Center(child: Text("لا يوجد صور"))
                       : PageView.builder(
                     controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() => selectedIndex = index);
-                    },
-                    itemCount: context.read<ApartmentCubit>().imageFiles.length,
+                    onPageChanged: (index) => setState(() => selectedIndex = index),
+                    itemCount: totalImages,
                     itemBuilder: (context, index) {
+                      final isLocal = index >= widget.imageUrls.length;
+
                       return Stack(
                         children: [
-                          Image.file(
-                            context.read<ApartmentCubit>().imageFiles[index],
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ),
-                          Positioned(
-                            top: 10,
-                            right: 10,
-                            child: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red, size: 30),
-                              onPressed: () => _deleteImage(index),
+                          Positioned.fill(
+                            child: isLocal
+                                ? Image.file(
+                              imageFiles[index - widget.imageUrls.length],
+                              fit: BoxFit.cover,
+                            )
+                                : Image.network(
+                             ApiEndPoints.imagesUrl + widget.imageUrls[index],
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, progress) {
+                                if (progress == null) return child;
+                                return const Center(child: CircularProgressIndicator());
+                              },
+                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
                             ),
                           ),
+                          if (isLocal)
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red, size: 30),
+                                onPressed: () => _deleteImage(index),
+                              ),
+                            ),
                         ],
                       );
                     },
@@ -85,20 +112,20 @@ class _ApartmentImagesSectionState extends State<ApartmentImagesSection> {
             ],
           ),
         ),
-        if (context.read<ApartmentCubit>().imageFiles.isNotEmpty)
+        SizedBox(height: 8.h),
+        if (totalImages > 0)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              context.read<ApartmentCubit>().imageFiles.length,
+              totalImages,
                   (index) => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: Container(
                   width: selectedIndex == index ? 16 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(5),
-                    color: Colors.orange,
+                    color: selectedIndex == index ? Colors.orange : Colors.grey,
                   ),
                 ),
               ),
@@ -109,6 +136,5 @@ class _ApartmentImagesSectionState extends State<ApartmentImagesSection> {
     );
   }
 
-  /// Optional: To retrieve selected image files for upload
-  List<File> getSelectedImages() => context.read<ApartmentCubit>().imageFiles;
+  List<File> getSelectedImages() => imageFiles;
 }

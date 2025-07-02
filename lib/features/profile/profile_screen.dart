@@ -196,9 +196,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         Navigator.pushNamedAndRemoveUntil(
                           context,
-                          login,
+                          selectRole,
                               (route) => false,
                         );
+
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,

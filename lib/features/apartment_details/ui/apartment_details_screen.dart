@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mo3tarib/core/routing/routes.dart';
+import 'package:mo3tarib/features/add_edit_apartment/logic/apartment_cubit.dart';
 import 'package:mo3tarib/features/add_edit_apartment/model/apartment_model.dart';
 import 'package:mo3tarib/features/apartment_details/widget/apartment_images_section.dart';
 import 'package:mo3tarib/features/register/model/user_model.dart';
@@ -20,6 +23,7 @@ class _ApartmentDetailsScreenState extends State<ApartmentDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    context.read<ApartmentCubit>().getRate(widget.apartment!.id!);
   }
 
   @override
@@ -84,7 +88,8 @@ class _ApartmentDetailsScreenState extends State<ApartmentDetailsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _infoChip(Icons.person, widget.apartment?.userName ?? ""),
+                        _infoChip(
+                            Icons.person, widget.apartment?.userName ?? ""),
                         _infoChip(Icons.bed,
                             widget.apartment?.numOfRooms?.toString() ?? ''),
                       ],
@@ -93,8 +98,10 @@ class _ApartmentDetailsScreenState extends State<ApartmentDetailsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _infoChip(Icons.location_on,
-                            widget.apartment?.location ?? ''),
+                        _infoChip(
+                          Icons.location_on,
+                          widget.apartment?.location ?? '',
+                        ),
                         _infoChip(Icons.square_foot,
                             '${widget.apartment?.distanceByMeters} م'),
                       ],
@@ -108,15 +115,17 @@ class _ApartmentDetailsScreenState extends State<ApartmentDetailsScreen> {
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
-                            color: Colors.red.shade100,
+                            color: widget.apartment!.isRent!
+                                ? Colors.red
+                                : Colors.green,
                           ),
                           child: Row(
                             children: [
                               Icon(
                                 Icons.sync,
                                 color: widget.apartment!.isRent!
-                                    ? Colors.red
-                                    : Colors.green,
+                                    ? Colors.white70
+                                    : Colors.white70,
                                 size: 18,
                               ),
                               const SizedBox(width: 4),
@@ -126,8 +135,8 @@ class _ApartmentDetailsScreenState extends State<ApartmentDetailsScreen> {
                                     : 'متوفر',
                                 style: TextStyle(
                                   color: widget.apartment!.isRent!
-                                      ? Colors.red
-                                      : Colors.green,
+                                      ? Colors.white70
+                                      : Colors.white70,
                                 ),
                               ),
                             ],
@@ -141,10 +150,12 @@ class _ApartmentDetailsScreenState extends State<ApartmentDetailsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MapScreen(
-                              late: widget.apartment!.addressLat.toString(),
-                              long: widget.apartment!.addressLong.toString(),
-                            ),
+                            builder: (context) =>
+                                MapScreen(
+                                  late: widget.apartment!.addressLat.toString(),
+                                  long: widget.apartment!.addressLong
+                                      .toString(),
+                                ),
                           ),
                         );
                       },
@@ -171,6 +182,7 @@ class _ApartmentDetailsScreenState extends State<ApartmentDetailsScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    buildRatingSection(apartment: widget.apartment!),
                     CommentsSection(apartment: widget.apartment!),
                   ],
                 ),
@@ -181,7 +193,6 @@ class _ApartmentDetailsScreenState extends State<ApartmentDetailsScreen> {
       ),
     );
   }
-
 
   Widget _infoChip(IconData icon, String label) {
     return Container(
@@ -194,12 +205,49 @@ class _ApartmentDetailsScreenState extends State<ApartmentDetailsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(label,
-              style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              maxLines: 1,
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.ellipsis)),
           const SizedBox(width: 4),
           Icon(icon, size: 16),
         ],
       ),
+    );
+  }
+
+  buildRatingSection({required ApartmentModel apartment}) {
+    return BlocBuilder<ApartmentCubit, ApartmentState>(
+      buildWhen: (previous, current) => current is GetRatingSuccess,
+      builder: (context, state) {
+        return Align(
+          alignment: Alignment.center,
+
+          child: RatingBar(
+            initialRating:  state is GetRatingSuccess ? state.ratings.toDouble() : 0,
+            unratedColor: Colors.grey,
+
+            ratingWidget: RatingWidget(
+              full: const Icon(
+                Icons.star,
+                color: Colors.orange,
+              ),
+              half: const Icon(
+                Icons.star_half,
+                color: Colors.grey,
+              ),
+              empty: const Icon(
+                Icons.star_border,
+                color: Colors.grey,
+              ),
+            ),
+            onRatingUpdate: (value) {
+              context.read<ApartmentCubit>().sendRate(apartment.id!, value.toInt());
+            },
+          ),
+        );
+      },
     );
   }
 }
